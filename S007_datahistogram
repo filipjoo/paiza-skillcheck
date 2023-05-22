@@ -1,0 +1,29 @@
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
+// 自分の得意な言語で
+// Let's チャレンジ！！
+var lines = [];
+var reader = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+// reader.on('line', (line) => {
+//     lines.push(line);
+// });
+// reader.on('close', () => {
+//     console.log(lines[0]);
+
+// });
+//テストケース
+
+// 文字列に対して、N文字目から指定文字が何文字目にあるかを返す関数
+const findChar = (str, char, n) => {
+    const str2 = str.slice(n);
+    const index = str2.indexOf(char);
+    if (index === -1) {
+        return -1;
+    } else {
+        return index + n;
+    }
+}
+

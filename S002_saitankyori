@@ -1,0 +1,107 @@
+process.stdin.resume();
+process.stdin.setEncoding('utf8');
+// 自分の得意な言語で
+// Let's チャレンジ！！
+var lines = [];
+var reader = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+reader.on('line', (line) => {
+    lines.push(line);
+});
+reader.on('close', () => {
+// 本番用
+    const [meiroRow,meiroCol ] = lines[0].split(' ').map(Number);
+    const grid = lines.slice(1, meiroCol + 1);
+    const grid2 = grid.map((row) => row.split(' '));
+    // console.log(grid2);
+
+// テスト用
+// const [meiroCol, meiroRow] = [5, 4];
+// const grid2 = [
+//     ['0', 's', '0', '1'],
+//     ['0', '0', '1', '0'],
+//     ['0', '1', '1', 'g'],
+//     ['0', '0', '1', '0'],
+//     ['0', '0', '0', '0']
+// ];
+
+    let pos = sgCheck(grid2)
+
+    // grid2のsを0に変更
+    grid2[pos[0]][pos[1]] = '0';
+    // grid2のgを0に変更
+    grid2[pos[2]][pos[3]] = '0';
+    // console.log(grid2);
+
+    // grid2を文字列から数値に変換
+    let grid3 = grid2.map((row) => row.map((col) => Number(col)));
+    // console.log(grid3);
+
+    console.log(bfs(meiroCol, meiroRow, grid3, pos[0], pos[1], pos[2], pos[3]));
+    
+});
+
+
+function sgCheck(grid2) {
+    // console.log(grid2);
+    const sStartRow = grid2.findIndex((row) => row.includes('s'));
+    const sStartCol = grid2[sStartRow].findIndex((col) => col === 's');
+    // console.log("初期位置:", { sStartRow }, { sStartCol });
+
+    const sGoalRow = grid2.findIndex((row) => row.includes('g'));
+    const sGoalCol = grid2[sGoalRow].findIndex((col) => col === 'g');
+    // console.log("ゴール位置:", { sGoalRow }, { sGoalCol });
+
+    return [ sStartRow,sStartCol, sGoalRow, sGoalCol];
+}
+
+// h:行数、w:列数、t:迷路、sx:スタートx(行)座標、sy:スタートy(列)座標、gx:ゴールx(行)座標、gy:ゴールy(列)座標
+function bfs(h, w, t, sx, sy, gx, gy) {
+    // console.log("bfs:", { h }, { w }, { t }, { sx }, { sy }, { gx }, { gy });
+    let open = [];
+    let closed = new Set();
+    const initialState = { x: sx, y: sy };
+    open.push(initialState);
+    // console.log("open:", open);
+    const dx = [1, 0, -1, 0];
+    const dy = [0, 1, 0, -1];
+    let cost = 0;
+    // tのコピーを作成
+    let t_copy = t.slice();
+
+
+    while (true) {
+        let tmpQ = [];
+        while (open.length > 0) {
+            let st = open.shift();
+            if (st.x === gx && st.y === gy) {
+                return cost;
+            }
+            if (t[st.x][st.y] === 1) {
+                continue;
+            }
+            if (closed.has(JSON.stringify(st))) {
+                continue;
+            }
+            closed.add(JSON.stringify(st));
+            t_copy[st.x][st.y] = "#";
+            // console.log("t_copy:", t_copy);
+            for (let i = 0; i < 4; i++) {
+                const nx = st.x + dx[i];
+                const ny = st.y + dy[i];
+                if (!(0 <= nx && nx < h && 0 <= ny && ny < w)) {
+                    continue;
+                }
+                tmpQ.push({ x: nx, y: ny });
+            }
+        }
+        if(tmpQ.length === 0){
+            return "Fail";
+        }
+        open = tmpQ;
+        cost++;
+    }
+}
+
